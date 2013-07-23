@@ -1,0 +1,24 @@
+{
+  "author": {
+    "name": "Matthew R Chase",
+    "email": "matt@chasefox.net",
+    "url": "http://chasefox.net/"
+  },
+  "name": "rgbLED",
+  "description": "An unofficial communication driver for the superbrightleds.com WiFi-CON (aka EasyBulb WiFi Box aka MiLight).  Please see the repository page for more information and examples.",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/secesh/node-rgb"
+  },
+  "keywords": ["LED", "WiFi", "RGB", "MiLight", "EasyBulb"],
+  "main": "./index",
+  "readmeFilename": "readme.md",
+  "bugs": {
+    "url": "https://github.com/secesh/node-rgb/issues"
+  },
+  "license": {
+  	"name": "GPLv3",
+  	"url": "http://www.gnu.org/licenses/gpl.html"
+  }
+}

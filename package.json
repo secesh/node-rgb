@@ -4,7 +4,7 @@
     "email": "matt@chasefox.net",
     "url": "http://chasefox.net/"
   },
-  "name": "rgbLED",
+  "name": "rgb-led",
   "description": "An unofficial communication driver for the superbrightleds.com WiFi-CON (aka EasyBulb WiFi Box aka MiLight).  Please see the repository page for more information and examples.",
   "version": "0.0.1",
   "repository": {

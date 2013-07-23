@@ -1,5 +1,5 @@
-rgbLED
-======
+rgb-led
+=======
 
 This project provides a communication driver, written for Node.JS, to ease the communication with
 The WiFi-CON (aka MiLight aka EasyBulb), a device that provides network access to an RGB LED 
@@ -15,14 +15,14 @@ to easily communicate with your color-changeable, dimming LED lights and light s
 ## Install
 
 ```bash
-npm install rgbLED
+npm install rgb-led
 ```
 
 ## Basic Usage
 In this example, we will connect to the controller, turn the lights on, and set the color.
 
 ```node
-var lights = require("rgbLED")
+var lights = require("rgb-led")
 
 lights.setHost("led") //This argument can be a hostname or IP Address.
 lights.turnOn()
@@ -37,7 +37,7 @@ Because the LED controller supports 256 colors, this cycle will take about 8 hou
 And then it starts over and just keeps going.
 
 ```node
-var lights = require("rgbLED")
+var lights = require("rgb-led")
 lights.setHost("led")
 lights.turnOn()
 var color = 0
@@ -62,15 +62,11 @@ LED strips, the other is the WiFi module.  Both are supplied by superbrightleds.
 is not associated with that site; we simply love the fact that they sell the wifi module, which
 is awesome, and we wanted to enable programmatic access to it.  Doing so took just a bit of
 reverse-engineering the protocol.
+
 Here's the controller you need: [goo.gl/WCqUL](http://goo.gl/WCqUL)
 and here's the wifi module: [goo.gl/uOjA9F](http://goo.gl/uOjA9F)
 
 ## Thanks
 We know this isn't a large project.  But we thought it was awesome fun and hope you totally
 enjoy building upon this.  Tell us all about it if you like; we love to be inspired.  If 
-you're feeling generous, the tip jar can be found here: <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="55A8WG9PDX2AU">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
+you're feeling generous, the tip jar can be found [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=55A8WG9PDX2AU)

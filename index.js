@@ -45,14 +45,40 @@ var sendMessage = function(command, value, callback, id){
 		//serves, though.
 		socket.close()
 		if(callback) callback(e, id)
-	})
+    })
 }
 
 var PORT = 50000, HOST = "192.168.1.100"
 //when calling setHost, the argument should be a string.  The value can be either an IP address or a host name.
 exports.setHost   = function(host){ HOST = host }
 
-exports.setColor  = function(color, callback, id){ sendMessage(32,color,callback,id) }
+var colors = {
+    "blue"       : 0,
+    "light blue" : 50,
+    "teal"       : 80,
+    "green"      : 100,
+    "yellow"     : 140,
+    "orange"     : 170,
+    "red"        : 180,
+    "purple"     : 190,
+    "pink"       : 200
+}
+exports.mixColor  = function(string, decimal){
+    /******************************************
+     * this function enables you to create or overwrite predefined color strings. With color strings, you can say
+     * lights.setColor("red") instead of having to remember red is 180.  This function allows you to say:
+     * lights.mixColor("awesome", 237) if that's what you want.
+     * 
+     * This function takes two arguments; the first is the label for the second argument, which is the value of 
+     * the color.  It's called "decimal" because it's a base-10 integer, not because it's a floating point number.
+     **************************************************************************/
+    colors[string] = decimal
+}
+exports.setColor  = function(color, callback, id){
+    if(typeof(color) == "string" && color in colors) color = colors[color]
+    if(!parseInt(color) === color) return console.trace("improper argument (" + color + ") supplied to setColor function with id: " + id)
+    sendMessage(32,color,callback,id)
+}
 
 exports.turnOff   = function(callback, id){ sendMessage(33,00,callback,id) }
 exports.turnOn    = function(callback, id){ sendMessage(34,00,callback,id) }

@@ -27,7 +27,10 @@ var lights = require("rgb-led")
 lights.setHost("led") //This argument can be a hostname or IP Address.
 lights.turnOn()
 
-lights.setColor(189) //Color is a one-byte value.  In decimal, this is expressed in the range 0-255.
+lights.setColor("green")
+//green is predefined as 100.  If you want to overwrite the predefined colors or just mix your own
+//colors, a method has been provided.
+lights.mixColor("greenish", 120); lights.setColor("greenish")
 ```
 
 ## Intermediate usage
@@ -40,9 +43,10 @@ And then it starts over and just keeps going.
 var lights = require("rgb-led")
 lights.setHost("led")
 lights.turnOn()
-var color = 0
+var color = 0 //Color is a one-byte value.  In decimal, this is expressed in the range 0-255.
 
-lights.setColor(color)
+lights.setColor(color)  //in the basic usage example, we called this function with a string.
+                        //now we're calling it with a numerical value.  both are acceptable.
 setInterval(function(){
     lights.setColor(color)
     color++
@@ -69,4 +73,4 @@ and here's the wifi module: [goo.gl/uOjA9F](http://goo.gl/uOjA9F)
 ## Thanks
 We know this isn't a large project.  But we thought it was awesome fun and hope you totally
 enjoy building upon this.  Tell us all about it if you like; we love to be inspired.  If 
-you're feeling generous, the tip jar can be found [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=55A8WG9PDX2AU)
+you're feeling generous, the tip jar can be found here: [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=55A8WG9PDX2AU)

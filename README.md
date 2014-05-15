@@ -25,7 +25,7 @@ some point.
 npm install rgb-led
 ```
 
-## Basic Usage - WiFi 370 type controller.
+## Basic Usage - WiFi 370 type controller
 In this example, we will connect to the controller, turn the lights on, and set the color.
 
 ```node
@@ -38,7 +38,7 @@ var Office = new led.wifi370('10.1.1.65')
 Office.writeToLight(255, 255, 255)
 ```
 
-## Advanced usage - WiFi 370 type controller.
+## Advanced usage - WiFi 370 type controller
 We've extended the basic example by adding a function to slowly and continuously cycle the
 lights. We've also added STDIN bindings to receive key commands. Run the script from a
 terminal, and you can use the arrow keys to adjust light color.
@@ -140,13 +140,16 @@ setInterval(function(){ cycle(true) }, 24000)
 ```
 
 ## The hardware
-This is the preferred module:
+
+###WiFi-370 (preferred)
 [Available on amazon](http://goo.gl/iU6QqW)
 
-This module is no longer recommended; it requires more components and doesn't work as well:
-Here's the controller you need: [goo.gl/WCqUL](http://goo.gl/WCqUL)
-and here's the wifi module: [goo.gl/uOjA9F](http://goo.gl/uOjA9F)
+###WiFi-CON (no longer preferred)
+This controller required multiple components and doesn't work as well - rather than allowing
+full 0-255 RGB color values, it only provides a limited color wheel:
+You need the WiFi module and a compatible LED controller. These are available from [wifiledlamp.com](http://goo.gl/vgGA6h) and they also [publish code](http://goo.gl/rw1raI).
 
+###Lights
 Need help figuring out LED lights? drop us a line.
 
 ## Thanks

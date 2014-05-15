@@ -2,15 +2,22 @@ rgb-led
 =======
 
 This project provides a communication driver, written for Node.JS, to ease the communication with
-The WiFi-CON (aka MiLight aka EasyBulb), a device that provides network access to an RGB LED 
-controller.  The WiFi-CON can act as a wifi client, which enables it to integrate with your existing
-LAN.  It can also act as a WiFi Access Point to provide a stand-alone network (enabling client access
-from your smartphone).  The initial commit of this project does not include information about how to
-configure your WiFi-CON.  It features a rather unintuitive, buggy, and poorly documented management
-portal.
+two types of WiFi LED controllers:
 
-With the WiFi-CON integrated to a LAN, this package provides programmatic access allowing you
-to easily communicate with your color-changeable, dimming LED lights and light strips!
+* WiFi370 (this is the recommended controller)
+* WiFi-CON (aka MiLight aka EasyBulb - this is a cheaper controller and no longer recommended)
+
+Both devices provide network access to an RGB LED controller. In their default state, they act
+as a WiFi Access Point to provide a stand-alone wireless network. You can download a free app 
+for your smartphone to control them. Both controllers can also be reconfigured to join your
+existing network as a WiFi client. Operating in this mode (station mode) allows you to control
+them from any host on your LAN.
+
+With your LED controller integrated to a LAN, this package provides programmatic access 
+allowing you to easily communicate with your color-changeable, dimming LED lights and 
+light strips! The configuration portals of the WiFi LED controllers are not overly intuitive
+and laden with bugs. We plan to document the process of reconfiguring their operating mode at
+some point.
 
 ## Install
 
@@ -18,59 +25,130 @@ to easily communicate with your color-changeable, dimming LED lights and light s
 npm install rgb-led
 ```
 
-## Basic Usage
+## Basic Usage - WiFi 370 type controller.
 In this example, we will connect to the controller, turn the lights on, and set the color.
 
 ```node
 var lights = require("rgb-led")
+var led = require('rgb-led')
+var Office = new led.wifi370('10.1.1.65')
 
-lights.setHost("led") //This argument can be a hostname or IP Address.
-lights.turnOn()
-
-lights.setColor("green")
-//green is predefined as 100.  If you want to overwrite the predefined colors or just mix your own
-//colors, a method has been provided.
-lights.mixColor("greenish", 120); lights.setColor("greenish")
+//send arguments as: red, green, blue
+//color values are 0-255.
+Office.writeToLight(255, 255, 255)
 ```
 
-## Intermediate usage
-In this example, we'll build on the basic usage example by setting the lights to slowly change.
-We provide a simple routine that will increment the color of the lights one step every 112 seconds.
-Because the LED controller supports 256 colors, this cycle will take about 8 hours to complete.
-And then it starts over and just keeps going.
+## Advanced usage - WiFi 370 type controller.
+We've extended the basic example by adding a function to slowly and continuously cycle the
+lights. We've also added STDIN bindings to receive key commands. Run the script from a
+terminal, and you can use the arrow keys to adjust light color.
 
 ```node
-var lights = require("rgb-led")
-lights.setHost("led")
-lights.turnOn()
-var color = 0 //Color is a one-byte value.  In decimal, this is expressed in the range 0-255.
+/****************************************
+* instantiate our lights.
+* The first argument is an IP or hostname.
+* The second argument is an optional name used when printing information to the console.
+******************************************************************/
+var led = require('rgb-led')
+var Office = new led.wifi370('10.1.1.65', 'Office')
+var Living = new led.wifi370('10.1.1.66', 'Living')
 
-lights.setColor(color)  //in the basic usage example, we called this function with a string.
-                        //now we're calling it with a numerical value.  both are acceptable.
-setInterval(function(){
-    lights.setColor(color)
-    color++
-    if(color >= 256) color = 0
-}, 112000)
+/**************************************
+* The wifi370 controller takes three values
+* representing voltage levels for red, green,
+* and blue.
+*
+* In this block, we create an array of colors 
+* that we'll use to continually and gradually
+* fade the lights.
+*******************************************/
+var step = 1
+var colors = []
+//Fade red to green
+for(var i=0; i<256; i+= step){
+	colors.push({r: 255-i, g: i, b: 0})
+}
+//Fade green to blue
+for(var i=0; i<256; i+= step){
+	colors.push({r: 0, g: 255-i, b: i})
+}
+//Fade blue to red
+for(var i=0; i<256; i+= step){
+	colors.push({r: i, g: 0, b: 255-i})
+}
+
+
+var color = 0 //global variable marking our position within the colors array.
+var brightness = 100 //global variable indicating the dim level.  100 is not dim.
+
+function writeToLights(){
+	//This function is a simple DRY wrapper. Brightness is an optional value.
+	Office.writeToLight(colors[color].r, colors[color].g, colors[color].b, brightness)
+	Living.writeToLight(colors[color].r, colors[color].g, colors[color].b, brightness)
+}
+
+function cycle(forward){
+	//This function gets called continuously on an interval.  This is what 
+	//keeps cycling our lights.  The forward variable indicates which
+	//direction to cycle through the array; it gets used by keybindings to
+	//right and left arrows for manually cycling the colors.
+	if(forward){
+		color++
+		if(color >= colors.length) color = 0
+	}else{
+		color--
+		if(color < 0) color = colors.length-1
+	}
+	
+	writeToLights()
+}
+
+/***************************************
+* And here's the block where we setup
+* keybindings to allow manual changes
+********************************************/
+var stdin = process.stdin
+stdin.setRawMode( true )
+stdin.resume()
+stdin.on( 'data', function( key ){
+	if(key == '\x03'){
+		//ctrl+c was pressed.
+		process.exit()
+	}else if(key == "\x1B\x5BC"){
+		//Right arrow key was pressed; cycle forwards through the colors.
+		cycle(true)
+	}else if(key == "\x1B\x5BD"){
+		//Left arrow key.  cycle backwards through the colors.
+		cycle()
+	}else if(key == "\x1B\x5BA"){
+		//up arrow key.  increase the brightness level.
+		if(brightness < 100) brightness += 1
+		writeToLights()
+	}else if(key == "\x1B\x5BB"){
+		//down arrow key.  decrease the brightness level.
+		if(brightness > 0) brightness -= 1
+		writeToLights()
+	}else{
+		//we don't know what key was pressed.
+		//uncomment the following to log the keypress so it can be implemented.
+		//process.stdout.write( escape(key) )
+	}
+})
+
+//This is the continuous interval that constantly changes the lights.
+setInterval(function(){ cycle(true) }, 24000)
 ```
 
 ## The hardware
-Apparently the WiFi module works with multiple products.  It's super cheap generic hardware 
-manufactured in china.  It's not obvious what all it works with or who really makes it, though
-it bears a copyright from CEC Huada Electronic Design Co., Ltd.  Are they DBA HED International?
-Because that's who produced the android application from which the protocol was discovered.
+This is the preferred module:
+[Available on amazon](http://goo.gl/iU6QqW)
 
-Anyway, we came across the device as a way to bridge LED light strips to a network, so that's 
-what we'll give as an example.  In this case, you need two controllers.  One connects to your 
-LED strips, the other is the WiFi module.  Both are supplied by superbrightleds.com.  This project
-is not associated with that site; we simply love the fact that they sell the wifi module, which
-is awesome, and we wanted to enable programmatic access to it.  Doing so took just a bit of
-reverse-engineering the protocol.
-
+This module is no longer recommended; it requires more components and doesn't work as well:
 Here's the controller you need: [goo.gl/WCqUL](http://goo.gl/WCqUL)
 and here's the wifi module: [goo.gl/uOjA9F](http://goo.gl/uOjA9F)
 
+Need help figuring out LED lights? drop us a line.
+
 ## Thanks
 We know this isn't a large project.  But we thought it was awesome fun and hope you totally
-enjoy building upon this.  Tell us all about it if you like; we love to be inspired.  If 
-you're feeling generous, the tip jar can be found here: [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=55A8WG9PDX2AU)
+enjoy building upon this.  Tell us all about it if you like; we love to be inspired.
